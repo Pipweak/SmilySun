@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smilysun.data.FakeWeatherRepository
 import com.example.smilysun.model.WeatherDay
 
 /**
@@ -42,15 +43,7 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun SmilySunApp() {
-    val todayWeather = WeatherDay(
-        city = "Montréal",
-        temperature = 22,
-        condition = "Ensoleillé",
-        emoji = "☀️",
-        message = "Belle journée pour sortir un peu."
-    )
-
-    HomeScreen(weather = todayWeather)
+    HomeScreen(weather = FakeWeatherRepository.todayWeather)
 }
 
 /**
@@ -79,5 +72,39 @@ fun HomeScreen(weather: WeatherDay) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(text = weather.message, fontSize = 16.sp)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        SavedLocationsSection(locations = FakeWeatherRepository.savedLocations)
+    }
+}
+
+/**
+ * SavedLocationRow = ligne d’une ville sauvegardée.
+ *
+ * Ce composant servira plus tard dans l’écran "Mes endroits".
+ * Pour l’instant, on le prépare avec le modèle temporaire WeatherDay.
+ */
+@Composable
+fun SavedLocationRow(weather: WeatherDay) {
+    Text(text = "${weather.city} — ${weather.emoji} ${weather.temperature}°C")
+}
+
+/**
+ * SavedLocationsSection = section temporaire qui affiche les villes sauvegardées.
+ *
+ * Plus tard, cette section ira probablement dans un vrai écran :
+ * SavedLocationsScreen.
+ */
+@Composable
+fun SavedLocationsSection(locations: List<WeatherDay>) {
+    Column {
+        Text(text = "Mes endroits", fontSize = 20.sp)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        locations.forEach { weather ->
+            SavedLocationRow(weather = weather)
+        }
     }
 }

@@ -1,13 +1,32 @@
 # SmilySun — V1 Plan Checklist
 
-SmilySun est une petite application Android météo créée pour apprendre le développement mobile étape par étape.
+SmilySun est une application Android météo simple créée pour apprendre le développement mobile étape par étape.
 
-La première version ne consomme aucune API.  
-Elle utilise des données météo locales/fictives afin de se concentrer sur les bases : interface, composants, état, navigation simple et organisation du code.
+La V1 ne consomme aucune API. Elle utilise des données météo locales/fictives afin de se concentrer sur les bases : interface, composants, état, navigation simple et organisation du code.
 
 ---
 
-## Objectif du projet
+# État actuel
+
+## Branches
+
+```txt
+develop = branche de travail par défaut
+main = branche stable / releases
+```
+
+## Statut global
+
+- [x] Repo GitHub créé : `Pipweak/SmilySun`
+- [x] Branche `develop` créée
+- [x] Branche `develop` définie comme branche par défaut
+- [x] Branche `main` réservée aux releases
+- [x] Étape 1 terminée
+- [x] Étape 2 commencée
+
+---
+
+# Objectif du projet
 
 Créer une V1 simple d’une application météo Android avec :
 
@@ -20,7 +39,7 @@ Créer une V1 simple d’une application météo Android avec :
 
 ---
 
-## Stack technique
+# Stack technique
 
 - [x] Android Studio
 - [x] Kotlin
@@ -28,26 +47,27 @@ Créer une V1 simple d’une application météo Android avec :
 - [x] Données locales
 - [x] Pas de backend
 - [x] Pas d’API pour la V1
+- [x] Git local
+- [x] GitHub
 
 ---
 
-## Version actuelle visée : V1 sans API
+# Version actuelle visée : V1 sans API
 
-### Fonctionnalités principales
+## Fonctionnalités principales
 
 - [x] Afficher le nom de l’application : SmilySun
-- [ ] Afficher une ville sélectionnée
-- [ ] Afficher la météo actuelle fictive
-- [ ] Afficher une température
-- [ ] Afficher une condition météo
-- [ ] Afficher un emoji ou une icône météo
+- [x] Afficher une ville statique : Montréal
+- [x] Afficher une température statique : 22°C
+- [x] Afficher une condition météo statique : Ensoleillé
+- [x] Afficher un emoji météo statique : ☀️
 - [ ] Afficher un petit message météo
 - [ ] Afficher une prévision sur 3 jours
 - [ ] Changer de ville avec une sélection simple
 
 ---
 
-## Exemple d’affichage cible
+# Exemple d’affichage cible
 
 ```txt
 SmilySun
@@ -68,32 +88,104 @@ Après-demain    🌧️ 15°C
 
 ---
 
-## Structure recommandée du projet
+# Structure actuelle / cible
+
+## Structure actuelle simplifiée
+
+Pour apprendre, les premiers composables sont encore dans `MainActivity.kt`.
 
 ```txt
-app/
- └── src/
-     └── main/
-         └── java/com/example/smilysun/
-             ├── MainActivity.kt
-             ├── model/
-             │   └── WeatherDay.kt
-             ├── data/
-             │   └── FakeWeatherRepository.kt
-             ├── ui/
-             │   ├── HomeScreen.kt
-             │   ├── WeatherCard.kt
-             │   ├── ForecastList.kt
-             │   ├── ForecastItem.kt
-             │   └── CitySelector.kt
-             └── theme/
-                 └── Theme.kt
+app/src/main/java/com/example/smilysun/
+└── MainActivity.kt
 ```
 
-Note : dans ton projet actuel, le package est :
+## Structure cible progressive
+
+Quand le fichier commence à grossir, on séparera les responsabilités :
+
+```txt
+app/src/main/java/com/example/smilysun/
+├── MainActivity.kt
+├── ui/
+│   ├── SmilySunApp.kt
+│   ├── screen/
+│   │   └── HomeScreen.kt
+│   └── component/
+│       ├── WeatherCard.kt
+│       ├── ForecastList.kt
+│       └── CitySelector.kt
+├── model/
+│   └── WeatherDay.kt
+└── data/
+    └── FakeWeatherRepository.kt
+```
+
+Règle :
+
+```txt
+MainActivity = point d’entrée Android uniquement
+SmilySunApp = racine Compose
+HomeScreen = écran principal
+component/ = composants réutilisables
+model/ = data classes
+data/ = données locales/fictives
+```
+
+---
+
+# État actuel du code
+
+## `MainActivity.kt`
 
 ```kotlin
 package com.example.smilysun
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+/**
+ * MainActivity = point d’entrée Android
+ */
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContent {
+            SmilySunApp()
+        }
+    }
+}
+
+/**
+ * SmilySunApp = racine Compose
+ */
+@Composable
+fun SmilySunApp() {
+    HomeScreen()
+}
+
+/**
+ * HomeScreen = écran principal
+ */
+@Composable
+fun HomeScreen() {
+    Column(
+        modifier = Modifier.padding(24.dp)
+    ) {
+        Text("SmilySun")
+        Text("Montréal")
+        Text("☀️ 22°C")
+        Text("Ensoleillé")
+    }
+}
 ```
 
 ---
@@ -102,18 +194,16 @@ package com.example.smilysun
 
 ## Étape 1 — Créer le projet Android
 
-### Objectif
-
-Créer le projet Android, vérifier les fichiers importants, déclarer `MainActivity` et préparer le point d’entrée de l’app.
+Statut : terminé.
 
 ### Checklist Étape 1
 
 - [x] Ouvrir Android Studio
 - [x] Créer le projet `SmilySun`
 - [x] Utiliser Kotlin
-- [x] Utiliser Jetpack Compose
+- [x] Ajouter Jetpack Compose manuellement via Gradle
 - [x] Attendre que Gradle Sync se termine
-- [x] Vérifier le package réel du projet
+- [x] Vérifier le package réel du projet : `com.example.smilysun`
 - [x] Vérifier que `MainActivity.kt` existe
 - [x] Vérifier que `AndroidManifest.xml` existe
 - [x] Transformer `MainActivity` en vraie Activity Android
@@ -123,180 +213,108 @@ Créer le projet Android, vérifier les fichiers importants, déclarer `MainActi
 - [x] Ajouter `onCreate` dans `MainActivity`
 - [x] Ajouter `setContent`
 - [x] Afficher un premier `Text("SmilySun")`
+- [x] Créer un émulateur local stable
 - [x] Lancer l’app
 - [x] Vérifier que l’écran affiche `SmilySun`
 
----
+### Concepts vus
 
-### Notes importantes de l’étape 1
-
-#### MainActivity minimale validée
-
-```kotlin
-package com.example.smilysun
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            Text("SmilySun")
-        }
-    }
-}
-```
-
-#### Manifest validé
-
-```xml
-<activity
-    android:name=".MainActivity"
-    android:exported="true">
-
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-    </intent-filter>
-
-</activity>
-```
-
-À retenir :
-
-```txt
-MAIN
-= cette Activity est le point d’entrée principal
-
-LAUNCHER
-= cette Activity peut être lancée depuis l’icône de l’app
-```
-
-#### Compose ajouté manuellement
-
-Le projet n’avait pas Compose configuré au départ.  
-Compose a été ajouté via Gradle.
-
-À retenir :
-
-```txt
-setContent
-= point d’entrée Compose dans une Activity Android
-```
+- projet Android
+- package
+- `AndroidManifest.xml`
+- `<manifest>`
+- `<application>`
+- `<activity>`
+- `MAIN`
+- `LAUNCHER`
+- `MainActivity`
+- `ComponentActivity`
+- `onCreate`
+- `super.onCreate`
+- `setContent`
+- `Text`
+- Compose dans Gradle
+- émulateur local vs device cloud
 
 ---
 
-## Checkpoint Étape 1
+## Étape 2 — Créer un premier écran statique
 
-L’étape 1 est terminée.
+Statut : en cours.
 
-- [x] Le projet compile
-- [x] Android sait lancer `MainActivity`
-- [x] `MainActivity` contient `onCreate`
-- [x] `setContent` affiche quelque chose
-- [x] L’app démarre sur émulateur ou téléphone
-- [x] Le texte `SmilySun` apparaît à l’écran
-
----
-
-# Étape 2 — Créer un premier écran statique
-
-## Objectif
+### Objectif
 
 Créer une interface très simple avec :
 
-- [ ] le titre `SmilySun`
-- [ ] une ville
-- [ ] une température
-- [ ] une condition météo
-- [ ] un emoji météo
+- [x] le titre `SmilySun`
+- [x] une ville : `Montréal`
+- [x] une température : `22°C`
+- [x] une condition météo : `Ensoleillé`
+- [x] un emoji météo : `☀️`
+- [ ] un layout un peu plus propre
+- [ ] une interface centrée
+- [ ] une typographie plus lisible
 
-Exemple :
+### Checklist Étape 2
 
-```txt
-SmilySun
-
-Montréal
-☀️ 22°C
-Ensoleillé
-```
-
----
-
-## Checklist Étape 2
-
-- [ ] Créer une fonction `SmilySunApp`
-- [ ] Déplacer `Text("SmilySun")` dans `SmilySunApp`
-- [ ] Ajouter l’import `@Composable`
-- [ ] Remplacer `Text("SmilySun")` dans `setContent` par `SmilySunApp()`
-- [ ] Ajouter une `Column`
-- [ ] Mettre les textes les uns sous les autres
-- [ ] Afficher `SmilySun`
-- [ ] Afficher `Montréal`
-- [ ] Afficher `☀️ 22°C`
-- [ ] Afficher `Ensoleillé`
-- [ ] Ajouter un peu de padding
-- [ ] Centrer l’interface
-- [ ] Lancer l’app
+- [x] Créer une fonction `SmilySunApp`
+- [x] Déplacer l’appel UI dans `SmilySunApp`
+- [x] Ajouter l’import `@Composable`
+- [x] Remplacer `Text("SmilySun")` dans `setContent` par `SmilySunApp()`
+- [x] Créer une fonction `HomeScreen`
+- [x] Faire appeler `HomeScreen()` par `SmilySunApp()`
+- [x] Ajouter une `Column`
+- [x] Mettre les textes les uns sous les autres
+- [x] Afficher `SmilySun`
+- [x] Afficher `Montréal`
+- [x] Afficher `☀️ 22°C`
+- [x] Afficher `Ensoleillé`
+- [x] Ajouter un premier `Modifier.padding(24.dp)`
+- [x] Ajouter de la KDoc simple sur `MainActivity`, `SmilySunApp`, `HomeScreen`
+- [ ] Ajouter `fillMaxSize()`
+- [ ] Ajouter `verticalArrangement = Arrangement.Center`
+- [ ] Ajouter `horizontalAlignment = Alignment.CenterHorizontally`
+- [ ] Ajouter des tailles de texte avec `fontSize`
+- [ ] Lancer l’app après ces changements
 - [ ] Vérifier que l’écran statique s’affiche correctement
 
----
+### Concepts à apprendre / en cours
 
-## Concepts à apprendre dans l’étape 2
-
-- [ ] `@Composable`
-- [ ] `Column`
-- [ ] `Text`
-- [ ] `Modifier`
-- [ ] `padding`
+- [x] `@Composable`
+- [x] `Column`
+- [x] `Text`
+- [x] `Modifier`
+- [x] `padding`
+- [x] `dp`
+- [ ] `fillMaxSize`
 - [ ] `fontSize`
 - [ ] `verticalArrangement`
 - [ ] `horizontalAlignment`
 
----
+### Prochaine mini-étape
 
-## Prochaine mini-étape
-
-Créer une fonction Compose :
+Centrer proprement l’écran :
 
 ```kotlin
-@Composable
-fun SmilySunApp() {
+Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(24.dp),
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
     Text("SmilySun")
+    Text("Montréal")
+    Text("☀️ 22°C")
+    Text("Ensoleillé")
 }
-```
-
-Puis remplacer :
-
-```kotlin
-setContent {
-    Text("SmilySun")
-}
-```
-
-par :
-
-```kotlin
-setContent {
-    SmilySunApp()
-}
-```
-
-Objectif :
-
-```txt
-setContent garde seulement le point d’entrée Compose.
-SmilySunApp devient le premier composant d’écran.
 ```
 
 ---
 
 # Étape 3 — Créer le modèle météo
+
+Statut : à venir.
 
 Checklist :
 
@@ -326,6 +344,8 @@ data class WeatherDay(
 
 # Étape 4 — Créer des données météo fictives
 
+Statut : à venir.
+
 Checklist :
 
 - [ ] Créer le dossier `data`
@@ -337,6 +357,8 @@ Checklist :
 ---
 
 # Étape 5 — Brancher l’interface sur les données
+
+Statut : à venir.
 
 Objectif :
 
@@ -352,9 +374,11 @@ Objectif :
 
 # Étape 6 — Créer une carte météo
 
+Statut : à venir.
+
 Checklist :
 
-- [ ] Créer le dossier `ui`
+- [ ] Créer le dossier `ui/component`
 - [ ] Créer le fichier `WeatherCard.kt`
 - [ ] Créer une fonction composable `WeatherCard`
 - [ ] Passer `weather` en paramètre
@@ -367,6 +391,8 @@ Checklist :
 ---
 
 # Étape 7 — Ajouter une prévision sur 3 jours
+
+Statut : à venir.
 
 Checklist :
 
@@ -381,6 +407,8 @@ Checklist :
 ---
 
 # Étape 8 — Ajouter une sélection de ville
+
+Statut : à venir.
 
 Checklist :
 
@@ -399,6 +427,8 @@ Checklist :
 
 # Étape 9 — Améliorer le style visuel
 
+Statut : à venir.
+
 Checklist :
 
 - [ ] Choisir une direction artistique simple
@@ -412,6 +442,8 @@ Checklist :
 
 # Étape 10 — Ajouter une mini animation
 
+Statut : à venir.
+
 Checklist :
 
 - [ ] Faire bouger légèrement le soleil
@@ -424,32 +456,21 @@ Checklist :
 
 # Étape 11 — Nettoyer le code
 
-Séparer progressivement le code en plusieurs fichiers :
+Statut : à venir.
 
-- [ ] `MainActivity.kt`
-- [ ] `HomeScreen.kt`
-- [ ] `WeatherCard.kt`
-- [ ] `ForecastList.kt`
-- [ ] `ForecastItem.kt`
-- [ ] `CitySelector.kt`
-- [ ] `WeatherDay.kt`
-- [ ] `FakeWeatherRepository.kt`
-
----
-
-# Étape 12 — Mettre le projet sur GitHub
+Objectif : séparer progressivement le code en plusieurs fichiers.
 
 Checklist :
 
-- [ ] Créer un repo GitHub `smilysun`
-- [ ] Ajouter le code source
-- [ ] Ajouter le README
-- [ ] Ajouter `v1-plan.md`
-- [ ] Ajouter `ai_skills.md`
-- [ ] Ajouter `docs/learning`
-- [ ] Ajouter éventuellement des screenshots
-- [ ] Écrire une courte description du projet
-- [ ] Faire un premier commit propre
+- [ ] `MainActivity.kt` contient seulement le point d’entrée Android
+- [ ] `ui/SmilySunApp.kt`
+- [ ] `ui/screen/HomeScreen.kt`
+- [ ] `ui/component/WeatherCard.kt`
+- [ ] `ui/component/ForecastList.kt`
+- [ ] `ui/component/ForecastItem.kt`
+- [ ] `ui/component/CitySelector.kt`
+- [ ] `model/WeatherDay.kt`
+- [ ] `data/FakeWeatherRepository.kt`
 
 ---
 
@@ -459,11 +480,9 @@ Checklist :
 
 - [x] écran statique minimal
 - [x] titre SmilySun
-- [ ] météo fictive
-- [ ] température fictive
-- [ ] condition météo fictive
-
----
+- [x] météo fictive statique
+- [x] température fictive statique
+- [x] condition météo fictive statique
 
 ## V1 — Version locale complète
 
@@ -474,8 +493,6 @@ Checklist :
 - [ ] UI propre
 - [ ] composants séparés
 
----
-
 ## V1.1 — Amélioration UX
 
 - [ ] sauvegarder la ville préférée
@@ -483,8 +500,6 @@ Checklist :
 - [ ] améliorer le thème visuel
 - [ ] ajouter mode clair / sombre
 - [ ] ajouter plus de messages météo
-
----
 
 ## V2 — Vraie météo avec API
 
@@ -494,13 +509,6 @@ Checklist :
 - [ ] gérer les erreurs
 - [ ] gérer la localisation
 - [ ] remplacer les données fictives par des données réelles
-
-APIs possibles plus tard :
-
-- [ ] Open-Meteo
-- [ ] WeatherAPI
-- [ ] Tomorrow.io
-- [ ] Meteomatics
 
 ---
 
@@ -521,33 +529,11 @@ Ici `[x]` veut dire : volontairement exclu de la V1.
 
 ---
 
-# Résumé
-
-SmilySun V1 est une application Android météo simple, construite avec Kotlin et Jetpack Compose.
-
-La V1 utilise uniquement des données locales fictives afin d’apprendre les bases du développement Android sans se bloquer sur les APIs, les permissions ou le backend.
-
-Objectif final de la V1 :
-
-```txt
-Une app météo locale simple
-Une interface propre
-Plusieurs villes
-Une prévision sur 3 jours
-Aucune API
-Un projet bien organisé
-```
-
----
-
 # Prochaine étape
 
-Commencer l’étape 2 :
+Continuer l’étape 2 :
 
-- [ ] Créer une fonction `SmilySunApp`
-- [ ] Déplacer `Text("SmilySun")` dans `SmilySunApp`
-- [ ] Utiliser une `Column`
-- [ ] Afficher `SmilySun`
-- [ ] Afficher `Montréal`
-- [ ] Afficher `☀️ 22°C`
-- [ ] Afficher `Ensoleillé`
+- [ ] centrer l’écran avec `fillMaxSize`, `Arrangement.Center`, `Alignment.CenterHorizontally`
+- [ ] ajouter des tailles de texte avec `fontSize`
+- [ ] vérifier que le fichier reste lisible
+- [ ] prévoir le futur refactor en fichiers séparés quand nécessaire

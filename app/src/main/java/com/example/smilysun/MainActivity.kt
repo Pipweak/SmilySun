@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smilysun.model.WeatherDay
 
 /**
  * MainActivity = point d’entrée Android.
@@ -41,7 +42,15 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun SmilySunApp() {
-    HomeScreen()
+    val todayWeather = WeatherDay(
+        city = "Montréal",
+        temperature = 22,
+        condition = "Ensoleillé",
+        emoji = "☀️",
+        message = "Belle journée pour sortir un peu."
+    )
+
+    HomeScreen(weather = todayWeather)
 }
 
 /**
@@ -50,7 +59,8 @@ fun SmilySunApp() {
  * Dans la V1, cet écran affiche une météo fictive statique.
  */
 @Composable
-fun HomeScreen() {
+fun HomeScreen(weather: WeatherDay) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,12 +72,12 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Montréal", fontSize = 20.sp)
-        Text(text = "☀️ 22°C", fontSize = 40.sp)
-        Text(text = "Ensoleillé", fontSize = 22.sp)
+        Text(text = weather.city, fontSize = 20.sp)
+        Text(text = "${weather.emoji} ${weather.temperature}°C", fontSize = 40.sp)
+        Text(text = weather.condition, fontSize = 22.sp)
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(text = "Belle journée pour sortir un peu.", fontSize = 16.sp)
+        Text(text = weather.message, fontSize = 16.sp)
     }
 }

@@ -11,9 +11,12 @@ La V1 ne consomme aucune API. Elle utilise des données météo locales/fictives
 ## Branches
 
 ```txt
-develop = branche de travail par défaut
+develop = branche de travail principale
 main = branche stable / releases
+feat/step-3-weather-model = branche de travail actuelle
 ```
+
+Important : pas d’accents dans les noms de branches Git.
 
 ## Statut global
 
@@ -27,8 +30,9 @@ main = branche stable / releases
 - [x] Début de données fake locales
 - [x] Début de l’écran `Mes endroits`
 - [x] Début du refactor en packages `ui`, `screen`, `component`, `model`, `data`
+- [x] `WeatherHomeScreen.kt` exporte maintenant `WeatherHomeScreen`
 
-Important : on n’avance plus strictement étape par étape. On reste majoritairement dans l’étape 3, mais on a volontairement fait un peu d’étape 4, 8 et 11 pour garder le projet cohérent.
+Important : on n’avance plus strictement étape par étape. On reste majoritairement dans l’étape 3, mais on a volontairement fait un peu d’étape 4, 5, 8 et 11 pour garder le projet cohérent.
 
 ---
 
@@ -146,7 +150,7 @@ Contenu envisagé progressivement :
 - aperçu des prévisions horaires
 - aperçu des prévisions sur quelques jours
 
-Note actuelle : le fichier `WeatherHomeScreen.kt` existe. La fonction peut encore s’appeler `HomeScreen` selon le dernier WIP local. À nettoyer dans la prochaine passe pour que nom de fichier et nom de composable soient alignés.
+État actuel : le fichier `WeatherHomeScreen.kt` existe et le composable exporté s’appelle bien `WeatherHomeScreen`.
 
 ## SavedLocationsScreen
 
@@ -221,10 +225,10 @@ MainActivity
 SmilySunApp
 = racine Compose, prépare les données fake et affiche l’écran principal
 
-WeatherHomeScreen.kt
+WeatherHomeScreen
 = écran météo principal, reçoit les données à afficher
 
-SavedLocationsScreen.kt
+SavedLocationsScreen
 = futur écran Mes endroits, préparé mais pas encore navigable
 
 SavedLocationsSection / SavedLocationRow
@@ -302,8 +306,8 @@ Objectif : sortir les valeurs météo de l’UI pour commencer à séparer donn�
 - [x] Comprendre `val` vs `var`
 - [x] Passer `weather: WeatherDay` à l’écran météo principal
 - [x] Commencer à retirer les valeurs hardcodées de l’UI
+- [x] Renommer/aligner `HomeScreen` en `WeatherHomeScreen`
 - [ ] Décider si `WeatherDay` reste le modèle de transition pour la suite immédiate
-- [ ] Renommer/aligner `HomeScreen` en `WeatherHomeScreen` si ce n’est pas déjà fait dans le code
 
 ---
 
@@ -420,10 +424,10 @@ Statut : commencée.
 - [x] Créer `ui/component/SavedLocationsSection.kt`
 - [x] Créer `model/WeatherDay.kt`
 - [x] Créer `data/FakeWeatherRepository.kt`
+- [x] Vérifier les noms de fonctions et fichiers après refactor
 - [ ] Créer `WeatherCard.kt`
 - [ ] Créer `ForecastList.kt`
 - [ ] Créer `ForecastItem.kt`
-- [ ] Vérifier les noms de fonctions et fichiers après refactor
 
 ---
 
@@ -472,9 +476,8 @@ Statut : commencée.
 
 # Prochaine étape
 
-Faire un point technique avant de continuer :
+Faire un point compile local après le refactor :
 
-- [ ] vérifier que le projet compile après refactor
-- [ ] vérifier si `WeatherHomeScreen.kt` exporte bien `WeatherHomeScreen` ou encore `HomeScreen`
-- [ ] si besoin, aligner le nom du composable avec le fichier
+- [ ] récupérer la branche à jour
+- [ ] vérifier que le projet compile après le renommage
 - [ ] ensuite seulement, ajouter l’état de navigation simple dans `SmilySunApp`

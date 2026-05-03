@@ -138,70 +138,25 @@ Respecter ce package tant que Vincent ne demande pas explicitement de le renomme
 
 ## État fonctionnel actuel
 
-L’étape 1 est terminée.
+L’étape 1 est terminée.  
+L’étape 2 est terminée sur la branche feature.
 
 L’app :
 
 - compile
 - lance `MainActivity`
 - utilise Compose via `setContent`
-- affiche `SmilySun`
-- a commencé l’étape 2 avec un écran statique
+- affiche un écran statique centré
+- affiche `SmilySun`, `Montréal`, `☀️ 22°C`, `Ensoleillé`
+- affiche un message météo statique
 
-## État actuel de `MainActivity.kt`
+## Branche en cours
 
-```kotlin
-package com.example.smilysun
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-
-/**
- * MainActivity = point d’entrée Android
- */
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            SmilySunApp()
-        }
-    }
-}
-
-/**
- * SmilySunApp = racine Compose
- */
-@Composable
-fun SmilySunApp() {
-    HomeScreen()
-}
-
-/**
- * HomeScreen = écran principal
- */
-@Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier.padding(24.dp)
-    ) {
-        Text("SmilySun")
-        Text("Montréal")
-        Text("☀️ 22°C")
-        Text("Ensoleillé")
-    }
-}
+```txt
+feat/etape-2-Créer-un-premier-écran-statique
 ```
 
-Remarque importante : cette structure est acceptable pour apprendre, mais il ne faut pas laisser `MainActivity.kt` devenir énorme.
+Cette branche doit être mergée vers `develop` via PR si validation OK.
 
 ---
 
@@ -262,7 +217,87 @@ On fera le refactor quand `MainActivity.kt` commence à devenir illisible.
 
 ---
 
-# 7. Règles de code
+# 7. État actuel de `MainActivity.kt`
+
+```kotlin
+package com.example.smilysun
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+/**
+ * MainActivity = point d’entrée Android.
+ *
+ * Cette classe est lancée par Android quand l’utilisateur ouvre l’app.
+ * Son rôle est de démarrer l’interface Compose avec `setContent`.
+ */
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContent {
+            SmilySunApp()
+        }
+    }
+}
+
+/**
+ * SmilySunApp = racine Compose de l’application.
+ *
+ * Pour l’instant, elle affiche seulement l’écran principal.
+ * Plus tard, elle pourra contenir le thème global ou la navigation.
+ */
+@Composable
+fun SmilySunApp() {
+    HomeScreen()
+}
+
+/**
+ * HomeScreen = écran principal de SmilySun.
+ *
+ * Dans la V1, cet écran affiche une météo fictive statique.
+ */
+@Composable
+fun HomeScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "SmilySun", fontSize = 32.sp)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Montréal", fontSize = 20.sp)
+        Text(text = "☀️ 22°C", fontSize = 40.sp)
+        Text(text = "Ensoleillé", fontSize = 22.sp)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = "Belle journée pour sortir un peu.", fontSize = 16.sp)
+    }
+}
+```
+
+---
+
+# 8. Règles de code
 
 ## Code minimal mais propre
 
@@ -314,9 +349,24 @@ fun HomeScreen() {
 
 Ne pas commenter chaque ligne. Commenter surtout les rôles, décisions et concepts.
 
+## Format Kotlin
+
+One-liners acceptés pour composants simples :
+
+```kotlin
+Text(text = "SmilySun", fontSize = 32.sp)
+```
+
+Multi-line préféré quand :
+
+- 3+ paramètres
+- modifier chainé
+- lambda enfant
+- code trop long pour rester lisible
+
 ---
 
-# 8. Concepts déjà clarifiés
+# 9. Concepts déjà clarifiés
 
 ## Jetpack Compose
 
@@ -331,12 +381,6 @@ Jetpack Compose = framework UI
 ## `@Composable`
 
 Un `@Composable` est un composant UI Compose.
-
-```kotlin
-@Composable
-fun HomeScreen() {
-}
-```
 
 Mentalement :
 
@@ -358,12 +402,12 @@ setContent {
 
 `Column` place ses enfants verticalement.
 
-```txt
-Column
- ├── Text("SmilySun")
- ├── Text("Montréal")
- ├── Text("☀️ 22°C")
- └── Text("Ensoleillé")
+## `Spacer`
+
+`Spacer` est un composant vide utilisé pour créer de l’espace.
+
+```kotlin
+Spacer(modifier = Modifier.height(16.dp))
 ```
 
 ## `Modifier`
@@ -371,32 +415,26 @@ Column
 `Modifier` applique du layout, du style ou du comportement à un composant Compose.
 
 ```kotlin
-Modifier.padding(24.dp)
+Modifier
+    .fillMaxSize()
+    .padding(24.dp)
 ```
 
 ## `dp`
 
 `dp` = density-independent pixels, unité adaptée aux différentes densités d’écran Android.
 
+## `sp`
+
+`sp` = scale-independent pixels, unité recommandée pour les tailles de texte parce qu’elle respecte les réglages d’accessibilité de l’utilisateur.
+
 ## Android Manifest
 
-Le Manifest est un contrat entre l’app et Android.
-
-Il déclare :
-
-- application
-- activities
-- point d’entrée `MAIN` / `LAUNCHER`
-- permissions
-- thème
-- icône
-- label
-
-Il ne déclare pas les composants Compose.
+Le Manifest est un contrat entre l’app et Android. Il ne déclare pas les composants Compose.
 
 ---
 
-# 9. Points techniques connus
+# 10. Points techniques connus
 
 ## Compose ajouté manuellement
 
@@ -442,7 +480,7 @@ x86_64
 
 ---
 
-# 10. Roadmap pédagogique
+# 11. Roadmap pédagogique
 
 ## Étape 1 — terminée
 
@@ -462,32 +500,40 @@ Concepts vus :
 - Compose/Gradle
 - émulateur local
 
-## Étape 2 — en cours
+## Étape 2 — terminée
 
-Objectif : écran statique propre.
+Objectif atteint : écran statique simple.
 
-Concepts :
+Concepts vus :
 
 - `SmilySunApp`
 - `HomeScreen`
 - `@Composable`
 - `Column`
 - `Text`
+- `Spacer`
 - `Modifier.padding`
+- `Modifier.fillMaxSize`
+- `Arrangement.Center`
+- `Alignment.CenterHorizontally`
 - `dp`
+- `sp`
 - KDoc de base
 
-Prochaine amélioration probable :
+## Étape 3 — prochaine étape
 
-```txt
-centrer l’écran avec fillMaxSize, Arrangement.Center, Alignment.CenterHorizontally
-```
+Objectif : créer le modèle météo `WeatherDay`.
 
-Puis plus tard : refactor en fichiers séparés.
+Concepts à venir :
+
+- package `model`
+- fichier `WeatherDay.kt`
+- `data class`
+- séparation données / UI
 
 ---
 
-# 11. Style de réponse attendu
+# 12. Style de réponse attendu
 
 Structure idéale :
 
@@ -503,7 +549,7 @@ Quand Vincent est frustré, ne pas répéter inutilement. Reconnaître et avance
 
 ---
 
-# 12. Résumé pour les IA
+# 13. Résumé pour les IA
 
 Quand tu travailles sur SmilySun :
 
@@ -517,4 +563,5 @@ Priorise la compréhension.
 Garde une architecture propre.
 Ajoute de la KDoc utile.
 Travaille sur develop, main sert aux releases.
+Étape 2 est terminée; prochaine étape = WeatherDay.
 ```

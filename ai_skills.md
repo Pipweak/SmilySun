@@ -25,7 +25,7 @@ Créer une V1 Android native avec :
 - données locales/fictives
 - aucune API météo
 - aucun backend
-- aucune géolocalisation
+- aucune géolocalisation réelle
 - aucune base de données distante
 - aucune publication Play Store au début
 
@@ -45,8 +45,6 @@ Il apprend :
 - structure de projet Android
 - bonnes pratiques progressives
 
-Il veut comprendre ce qu’il fait. Il ne veut pas simplement copier-coller du code.
-
 Style attendu :
 
 - direct
@@ -58,11 +56,7 @@ Style attendu :
 - KDoc/Javadoc utile dans le code
 - architecture propre, même si simple
 
----
-
-# 3. Règle pédagogique principale
-
-Toujours privilégier :
+Règle pédagogique principale :
 
 ```txt
 Comprendre > copier-coller
@@ -73,13 +67,9 @@ Propre > bordélique
 
 Ne pas donner de gros blocs de code sans contexte, sauf si Vincent demande explicitement “donne-moi le fichier complet”.
 
-Quand Vincent demande TLDR, répondre en TLDR.
-
 ---
 
-# 4. Parallèles Angular utiles
-
-L’IA peut utiliser des analogies Angular quand elles aident.
+# 3. Parallèles Angular utiles
 
 ```txt
 @Composable function
@@ -88,8 +78,8 @@ L’IA peut utiliser des analogies Angular quand elles aident.
 SmilySunApp
 ≈ racine de l’application Compose
 
-HomeScreen
-≈ page / screen component
+WeatherHomeScreen / SavedLocationsScreen
+≈ pages / screen components
 
 Modifier
 ≈ style/layout appliqué au composant, proche d’un mix CSS/directive
@@ -105,7 +95,7 @@ Attention : ne pas pousser l’analogie si elle devient fausse.
 
 ---
 
-# 5. État actuel du projet
+# 4. État actuel du projet
 
 ## Repo GitHub
 
@@ -118,15 +108,10 @@ Pipweak/SmilySun
 ```txt
 develop = branche de travail par défaut
 main = branche stable / releases
+feat/step-3-weather-model = branche en cours
 ```
 
-Workflow souhaité :
-
-```txt
-travail quotidien -> develop
-version stable -> merge vers main
-release éventuelle -> tag depuis main
-```
+Important : pas d’accents dans les noms de branches Git.
 
 ## Package actuel
 
@@ -139,48 +124,106 @@ Respecter ce package tant que Vincent ne demande pas explicitement de le renomme
 ## État fonctionnel actuel
 
 L’étape 1 est terminée.  
-L’étape 2 est terminée sur la branche feature.
+L’étape 2 est terminée.  
+L’étape 3 est en cours.
 
 L’app :
 
-- compile
 - lance `MainActivity`
 - utilise Compose via `setContent`
-- affiche un écran statique centré
-- affiche `SmilySun`, `Montréal`, `☀️ 22°C`, `Ensoleillé`
-- affiche un message météo statique
-
-## Branche en cours
-
-```txt
-feat/etape-2-Créer-un-premier-écran-statique
-```
-
-Cette branche doit être mergée vers `develop` via PR si validation OK.
+- `MainActivity.kt` est clean et appelle seulement `SmilySunApp()`
+- `SmilySunApp.kt` est la racine Compose
+- `WeatherHomeScreen.kt` exporte `WeatherHomeScreen`
+- `WeatherHomeScreen` reçoit un `WeatherDay` en paramètre
+- `SavedLocationsScreen.kt` existe, mais n’est pas encore branché à une navigation réelle
+- `WeatherDay.kt` existe comme modèle pédagogique temporaire
+- `FakeWeatherRepository.kt` fournit des villes météo fictives locales
 
 ---
 
-# 6. Architecture cible progressive
+# 5. Direction UX V1
 
-On ne veut pas empiler trop de `@Composable` dans `MainActivity.kt`.
+Vincent veut une V1 inspirée d’un mix entre :
 
-Structure cible plus propre :
+- Google Weather
+- MétéoMédia
+
+Le but n’est pas de copier ces apps, mais de viser :
+
+```txt
+un écran météo principal clair
+un écran Mes endroits pour gérer les villes
+une navigation simple entre les deux
+une interface météo visuelle et lisible
+```
+
+Document dédié :
+
+```txt
+docs/v1/ux-direction.md
+```
+
+## Écrans probables
+
+```txt
+WeatherHomeScreen
+= écran météo de la ville sélectionnée
+
+SavedLocationsScreen
+= écran Mes endroits / gestion des villes
+```
+
+---
+
+# 6. Stratégie modèles de données
+
+Le modèle actuel `WeatherDay` est pédagogique et temporaire.
+
+Il sert à apprendre :
+
+- `data class`
+- `val`
+- séparation données / UI
+- passage d’objet à un composant Compose
+
+Mais les modèles devront probablement évoluer selon :
+
+```txt
+1. les écrans construits
+2. les données fictives nécessaires à ces écrans
+3. la forme des données reçues par la future API météo
+```
+
+Modèles probables plus tard :
+
+```txt
+WeatherLocation
+CurrentWeather
+DailyForecast
+HourlyForecast
+```
+
+Règle : ne pas over-engineer maintenant. Créer uniquement ce que les écrans exigent.
+
+---
+
+# 7. Architecture actuelle
 
 ```txt
 app/src/main/java/com/example/smilysun/
 ├── MainActivity.kt
-├── ui/
-│   ├── SmilySunApp.kt
-│   ├── screen/
-│   │   └── HomeScreen.kt
-│   └── component/
-│       ├── WeatherCard.kt
-│       ├── ForecastList.kt
-│       └── CitySelector.kt
+├── data/
+│   └── FakeWeatherRepository.kt
 ├── model/
 │   └── WeatherDay.kt
-└── data/
-    └── FakeWeatherRepository.kt
+└── ui/
+    ├── SmilySunApp.kt
+    ├── component/
+    │   ├── SavedLocationRow.kt
+    │   └── SavedLocationsSection.kt
+    └── screen/
+        ├── SavedLocationsScreen.kt
+        └── WeatherHomeScreen.kt
 ```
 
 Responsabilités :
@@ -190,10 +233,13 @@ MainActivity
 = point d’entrée Android uniquement
 
 SmilySunApp
-= racine Compose de l’app
+= racine Compose + future navigation simple
 
-HomeScreen
-= écran principal
+WeatherHomeScreen
+= météo de la ville sélectionnée
+
+SavedLocationsScreen
+= gestion/choix des villes
 
 ui/component
 = composants réutilisables
@@ -211,88 +257,6 @@ Règle :
 1 écran important = 1 fichier
 1 composant réutilisable important = 1 fichier
 petits helpers privés = peuvent rester dans le même fichier
-```
-
-On fera le refactor quand `MainActivity.kt` commence à devenir illisible.
-
----
-
-# 7. État actuel de `MainActivity.kt`
-
-```kotlin
-package com.example.smilysun
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-/**
- * MainActivity = point d’entrée Android.
- *
- * Cette classe est lancée par Android quand l’utilisateur ouvre l’app.
- * Son rôle est de démarrer l’interface Compose avec `setContent`.
- */
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            SmilySunApp()
-        }
-    }
-}
-
-/**
- * SmilySunApp = racine Compose de l’application.
- *
- * Pour l’instant, elle affiche seulement l’écran principal.
- * Plus tard, elle pourra contenir le thème global ou la navigation.
- */
-@Composable
-fun SmilySunApp() {
-    HomeScreen()
-}
-
-/**
- * HomeScreen = écran principal de SmilySun.
- *
- * Dans la V1, cet écran affiche une météo fictive statique.
- */
-@Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "SmilySun", fontSize = 32.sp)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "Montréal", fontSize = 20.sp)
-        Text(text = "☀️ 22°C", fontSize = 40.sp)
-        Text(text = "Ensoleillé", fontSize = 22.sp)
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(text = "Belle journée pour sortir un peu.", fontSize = 16.sp)
-    }
-}
 ```
 
 ---
@@ -334,17 +298,15 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
-Pour un composant :
+Pour un modèle :
 
 ```kotlin
 /**
- * HomeScreen = écran principal de SmilySun.
+ * WeatherDay représente une journée météo dans SmilySun.
  *
- * Dans la V1, cet écran affiche une météo fictive statique.
+ * Pour la V1, ces données sont fictives et locales.
  */
-@Composable
-fun HomeScreen() {
-}
+data class WeatherDay(...)
 ```
 
 Ne pas commenter chaque ligne. Commenter surtout les rôles, décisions et concepts.
@@ -368,67 +330,21 @@ Multi-line préféré quand :
 
 # 9. Concepts déjà clarifiés
 
-## Jetpack Compose
-
-Compose est le framework UI déclaratif moderne d’Android.
-
 ```txt
 Kotlin = langage
 Android = plateforme
 Jetpack Compose = framework UI
+@Composable function ≈ composant UI
+setContent = point d’entrée Compose dans une Activity
+Column = layout vertical
+Spacer = espace vide
+Modifier = layout/style/comportement appliqué à un composant
+val = valeur en lecture seule
+var = valeur modifiable
+data class = classe pour représenter des données
+dp = unité Android adaptée aux densités d’écran
+sp = unité recommandée pour les tailles de texte
 ```
-
-## `@Composable`
-
-Un `@Composable` est un composant UI Compose.
-
-Mentalement :
-
-```txt
-@Composable function ≈ component UI
-```
-
-## `setContent`
-
-`setContent` est le point d’entrée Compose dans une `Activity`.
-
-```kotlin
-setContent {
-    SmilySunApp()
-}
-```
-
-## `Column`
-
-`Column` place ses enfants verticalement.
-
-## `Spacer`
-
-`Spacer` est un composant vide utilisé pour créer de l’espace.
-
-```kotlin
-Spacer(modifier = Modifier.height(16.dp))
-```
-
-## `Modifier`
-
-`Modifier` applique du layout, du style ou du comportement à un composant Compose.
-
-```kotlin
-Modifier
-    .fillMaxSize()
-    .padding(24.dp)
-```
-
-## `dp`
-
-`dp` = density-independent pixels, unité adaptée aux différentes densités d’écran Android.
-
-## `sp`
-
-`sp` = scale-independent pixels, unité recommandée pour les tailles de texte parce qu’elle respecte les réglages d’accessibilité de l’utilisateur.
-
-## Android Manifest
 
 Le Manifest est un contrat entre l’app et Android. Il ne déclare pas les composants Compose.
 
@@ -463,73 +379,33 @@ Material Components XML
 
 Vincent veut pouvoir créer ses propres composants. Il n’est pas obligé d’utiliser Material3 partout.
 
-## Émulateur
-
-Éviter les devices cloud si possible.
-
-Préférer :
-
-```txt
-Pixel 9a
-API 36 stable
-Google Play
-x86_64
-```
-
-Éviter les images `Pre-Release` pour l’apprentissage.
-
 ---
 
 # 11. Roadmap pédagogique
 
 ## Étape 1 — terminée
 
-Concepts vus :
-
-- projet Android
-- package
-- Git local + GitHub repo
-- branches `develop` / `main`
-- AndroidManifest
-- `MainActivity`
-- `ComponentActivity`
-- `onCreate`
-- `super.onCreate`
-- `setContent`
-- premier `Text`
-- Compose/Gradle
-- émulateur local
+Concepts vus : projet Android, package, Git/GitHub, branches, Manifest, `MainActivity`, `ComponentActivity`, `onCreate`, `super.onCreate`, `setContent`, premier `Text`, Compose/Gradle, émulateur local.
 
 ## Étape 2 — terminée
 
 Objectif atteint : écran statique simple.
 
-Concepts vus :
+Concepts vus : `SmilySunApp`, écran météo principal, `@Composable`, `Column`, `Text`, `Spacer`, `Modifier.padding`, `Modifier.fillMaxSize`, `Arrangement.Center`, `Alignment.CenterHorizontally`, `dp`, `sp`, KDoc de base.
 
-- `SmilySunApp`
-- `HomeScreen`
-- `@Composable`
-- `Column`
-- `Text`
-- `Spacer`
-- `Modifier.padding`
-- `Modifier.fillMaxSize`
-- `Arrangement.Center`
-- `Alignment.CenterHorizontally`
-- `dp`
-- `sp`
-- KDoc de base
+## Étape 3 — en cours
 
-## Étape 3 — prochaine étape
+Objectif : créer le modèle météo `WeatherDay`, mais sans partir trop vite dans une structure de modèles finale.
 
-Objectif : créer le modèle météo `WeatherDay`.
-
-Concepts à venir :
+Concepts vus / en cours :
 
 - package `model`
 - fichier `WeatherDay.kt`
 - `data class`
+- `val`
 - séparation données / UI
+- passage `weather: WeatherDay` à `WeatherHomeScreen`
+- début du refactor en `ui`, `screen`, `component`, `model`, `data`
 
 ---
 
@@ -562,6 +438,9 @@ Garde la V1 sans API.
 Priorise la compréhension.
 Garde une architecture propre.
 Ajoute de la KDoc utile.
-Travaille sur develop, main sert aux releases.
-Étape 2 est terminée; prochaine étape = WeatherDay.
+Travaille sur develop ou sur la branche de feature active.
+main sert aux releases.
+Étape 3 est en cours.
+WeatherHomeScreen est le nom actuel de l’écran météo principal.
+Ne pas figer les modèles trop tôt : ils doivent évoluer avec les écrans et la future API météo.
 ```

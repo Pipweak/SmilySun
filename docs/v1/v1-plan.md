@@ -22,7 +22,8 @@ main = branche stable / releases
 - [x] Branche `develop` définie comme branche par défaut
 - [x] Branche `main` réservée aux releases
 - [x] Étape 1 terminée
-- [x] Étape 2 commencée
+- [x] Étape 2 terminée
+- [ ] Étape 3 à commencer : modèle météo `WeatherDay`
 
 ---
 
@@ -30,11 +31,11 @@ main = branche stable / releases
 
 Créer une V1 simple d’une application météo Android avec :
 
-- [ ] une interface propre
-- [ ] une météo du jour fictive
+- [x] une première interface statique
+- [x] une météo du jour fictive statique
 - [ ] une prévision sur quelques jours
 - [ ] une sélection de ville
-- [ ] une structure de code claire
+- [ ] une structure de code claire en fichiers séparés
 - [x] aucune API externe pour commencer
 
 ---
@@ -61,13 +62,29 @@ Créer une V1 simple d’une application météo Android avec :
 - [x] Afficher une température statique : 22°C
 - [x] Afficher une condition météo statique : Ensoleillé
 - [x] Afficher un emoji météo statique : ☀️
-- [ ] Afficher un petit message météo
+- [x] Afficher un petit message météo statique
 - [ ] Afficher une prévision sur 3 jours
 - [ ] Changer de ville avec une sélection simple
 
 ---
 
-# Exemple d’affichage cible
+# Affichage actuel
+
+```txt
+SmilySun
+
+Montréal
+☀️ 22°C
+Ensoleillé
+
+Belle journée pour sortir un peu.
+```
+
+L’affichage est volontairement simple. Le but de l’étape 2 était de valider Compose, la structure de base, le layout vertical, le centrage et la lisibilité minimale.
+
+---
+
+# Exemple d’affichage cible V1
 
 ```txt
 SmilySun
@@ -143,15 +160,24 @@ package com.example.smilysun
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
- * MainActivity = point d’entrée Android
+ * MainActivity = point d’entrée Android.
+ *
+ * Cette classe est lancée par Android quand l’utilisateur ouvre l’app.
+ * Son rôle est de démarrer l’interface Compose avec `setContent`.
  */
 class MainActivity : ComponentActivity() {
 
@@ -165,7 +191,10 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * SmilySunApp = racine Compose
+ * SmilySunApp = racine Compose de l’application.
+ *
+ * Pour l’instant, elle affiche seulement l’écran principal.
+ * Plus tard, elle pourra contenir le thème global ou la navigation.
  */
 @Composable
 fun SmilySunApp() {
@@ -173,17 +202,30 @@ fun SmilySunApp() {
 }
 
 /**
- * HomeScreen = écran principal
+ * HomeScreen = écran principal de SmilySun.
+ *
+ * Dans la V1, cet écran affiche une météo fictive statique.
  */
 @Composable
 fun HomeScreen() {
     Column(
-        modifier = Modifier.padding(24.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("SmilySun")
-        Text("Montréal")
-        Text("☀️ 22°C")
-        Text("Ensoleillé")
+        Text(text = "SmilySun", fontSize = 32.sp)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Montréal", fontSize = 20.sp)
+        Text(text = "☀️ 22°C", fontSize = 40.sp)
+        Text(text = "Ensoleillé", fontSize = 22.sp)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = "Belle journée pour sortir un peu.", fontSize = 16.sp)
     }
 }
 ```
@@ -240,7 +282,7 @@ Statut : terminé.
 
 ## Étape 2 — Créer un premier écran statique
 
-Statut : en cours.
+Statut : terminé.
 
 ### Objectif
 
@@ -251,9 +293,10 @@ Créer une interface très simple avec :
 - [x] une température : `22°C`
 - [x] une condition météo : `Ensoleillé`
 - [x] un emoji météo : `☀️`
-- [ ] un layout un peu plus propre
-- [ ] une interface centrée
-- [ ] une typographie plus lisible
+- [x] un message météo statique
+- [x] un layout vertical simple
+- [x] une interface centrée
+- [x] une typographie minimale plus lisible
 
 ### Checklist Étape 2
 
@@ -269,52 +312,41 @@ Créer une interface très simple avec :
 - [x] Afficher `Montréal`
 - [x] Afficher `☀️ 22°C`
 - [x] Afficher `Ensoleillé`
-- [x] Ajouter un premier `Modifier.padding(24.dp)`
+- [x] Afficher un message météo statique
+- [x] Ajouter `Modifier.padding(24.dp)`
+- [x] Ajouter `fillMaxSize()`
+- [x] Ajouter `verticalArrangement = Arrangement.Center`
+- [x] Ajouter `horizontalAlignment = Alignment.CenterHorizontally`
+- [x] Ajouter des tailles de texte avec `fontSize`
+- [x] Ajouter des `Spacer`
 - [x] Ajouter de la KDoc simple sur `MainActivity`, `SmilySunApp`, `HomeScreen`
-- [ ] Ajouter `fillMaxSize()`
-- [ ] Ajouter `verticalArrangement = Arrangement.Center`
-- [ ] Ajouter `horizontalAlignment = Alignment.CenterHorizontally`
-- [ ] Ajouter des tailles de texte avec `fontSize`
-- [ ] Lancer l’app après ces changements
-- [ ] Vérifier que l’écran statique s’affiche correctement
+- [x] Lancer l’app après ces changements
+- [x] Vérifier que l’écran statique s’affiche correctement
 
-### Concepts à apprendre / en cours
+### Concepts appris dans l’étape 2
 
 - [x] `@Composable`
 - [x] `Column`
 - [x] `Text`
+- [x] `Spacer`
 - [x] `Modifier`
 - [x] `padding`
+- [x] `height`
 - [x] `dp`
-- [ ] `fillMaxSize`
-- [ ] `fontSize`
-- [ ] `verticalArrangement`
-- [ ] `horizontalAlignment`
-
-### Prochaine mini-étape
-
-Centrer proprement l’écran :
-
-```kotlin
-Column(
-    modifier = Modifier
-        .fillMaxSize()
-        .padding(24.dp),
-    verticalArrangement = Arrangement.Center,
-    horizontalAlignment = Alignment.CenterHorizontally
-) {
-    Text("SmilySun")
-    Text("Montréal")
-    Text("☀️ 22°C")
-    Text("Ensoleillé")
-}
-```
+- [x] `sp`
+- [x] `fillMaxSize`
+- [x] `fontSize`
+- [x] `verticalArrangement`
+- [x] `horizontalAlignment`
+- [x] KDoc simple sur les responsabilités
 
 ---
 
 # Étape 3 — Créer le modèle météo
 
-Statut : à venir.
+Statut : prochaine étape.
+
+Objectif : sortir les valeurs météo de l’UI pour commencer à séparer données et affichage.
 
 Checklist :
 
@@ -483,6 +515,7 @@ Checklist :
 - [x] météo fictive statique
 - [x] température fictive statique
 - [x] condition météo fictive statique
+- [x] message météo statique
 
 ## V1 — Version locale complète
 
@@ -531,9 +564,8 @@ Ici `[x]` veut dire : volontairement exclu de la V1.
 
 # Prochaine étape
 
-Continuer l’étape 2 :
+Commencer l’étape 3 :
 
-- [ ] centrer l’écran avec `fillMaxSize`, `Arrangement.Center`, `Alignment.CenterHorizontally`
-- [ ] ajouter des tailles de texte avec `fontSize`
-- [ ] vérifier que le fichier reste lisible
-- [ ] prévoir le futur refactor en fichiers séparés quand nécessaire
+- [ ] créer `model/WeatherDay.kt`
+- [ ] définir une `data class WeatherDay`
+- [ ] préparer la séparation entre données et interface

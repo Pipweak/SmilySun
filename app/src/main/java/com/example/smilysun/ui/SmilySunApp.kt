@@ -2,7 +2,7 @@ package com.example.smilysun.ui
 
 import androidx.compose.runtime.Composable
 import com.example.smilysun.data.FakeWeatherRepository
-import com.example.smilysun.ui.screen.HomeScreen
+import com.example.smilysun.ui.screen.WeatherHomeScreen
 
 /**
  * SmilySunScreen représente les écrans principaux de l’app.
@@ -25,7 +25,7 @@ private enum class SmilySunScreen {
  */
 @Composable
 fun SmilySunApp() {
-    HomeScreen(
+    WeatherHomeScreen(
         weather = FakeWeatherRepository.todayWeather,
         savedLocations = FakeWeatherRepository.savedLocations
     )

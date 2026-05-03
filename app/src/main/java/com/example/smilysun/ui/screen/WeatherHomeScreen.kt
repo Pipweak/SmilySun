@@ -16,13 +16,13 @@ import com.example.smilysun.model.WeatherDay
 import com.example.smilysun.ui.component.SavedLocationsSection
 
 /**
- * HomeScreen = écran principal de SmilySun.
+ * WeatherHomeScreen = écran météo principal de SmilySun.
  *
  * Dans la V1, cet écran affiche une météo fictive statique
  * ainsi qu’une première section temporaire de villes sauvegardées.
  */
 @Composable
-fun HomeScreen(
+fun WeatherHomeScreen(
     weather: WeatherDay,
     savedLocations: List<WeatherDay>
 ) {

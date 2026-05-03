@@ -5,6 +5,18 @@ import com.example.smilysun.data.FakeWeatherRepository
 import com.example.smilysun.ui.screen.HomeScreen
 
 /**
+ * SmilySunScreen représente les écrans principaux de l’app.
+ *
+ * Pour l’instant, on prépare seulement la navigation entre :
+ * - l’écran météo principal
+ * - l’écran Mes endroits
+ */
+private enum class SmilySunScreen {
+    WeatherHome,
+    SavedLocations
+}
+
+/**
  * SmilySunApp = racine Compose de l’application.
  *
  * Pour l’instant, elle prépare les données fictives et affiche l’écran principal.

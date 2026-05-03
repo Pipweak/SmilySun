@@ -19,12 +19,16 @@ main = branche stable / releases
 
 - [x] Repo GitHub créé : `Pipweak/SmilySun`
 - [x] Branche `develop` créée
-- [x] Branche `develop` définie comme branche par défaut
 - [x] Branche `main` réservée aux releases
 - [x] Étape 1 terminée
 - [x] Étape 2 terminée
 - [x] Étape 3 commencée : modèle météo `WeatherDay`
 - [x] Direction UX V1 clarifiée
+- [x] Début de données fake locales
+- [x] Début de l’écran `Mes endroits`
+- [x] Début du refactor en packages `ui`, `screen`, `component`, `model`, `data`
+
+Important : on n’avance plus strictement étape par étape. On reste majoritairement dans l’étape 3, mais on a volontairement fait un peu d’étape 4, 8 et 11 pour garder le projet cohérent.
 
 ---
 
@@ -52,15 +56,16 @@ docs/v1/ux-direction.md
 
 ---
 
-# Objectif du projet
+# Objectif V1
 
 Créer une V1 simple d’une application météo Android avec :
 
 - [x] une première interface statique
 - [x] une météo du jour fictive statique
+- [x] plusieurs villes fictives dans une source locale
 - [ ] une prévision sur quelques jours
-- [ ] une sélection de ville
-- [ ] une structure de code claire en fichiers séparés
+- [ ] une vraie sélection de ville
+- [x] une structure de code plus claire en fichiers séparés
 - [x] aucune API externe pour commencer
 
 ---
@@ -80,21 +85,27 @@ Créer une V1 simple d’une application météo Android avec :
 
 # Version actuelle visée : V1 sans API
 
-## Fonctionnalités principales
+## Fonctionnalités présentes
 
 - [x] Afficher le nom de l’application : SmilySun
-- [x] Afficher une ville statique : Montréal
-- [x] Afficher une température statique : 22°C
-- [x] Afficher une condition météo statique : Ensoleillé
-- [x] Afficher un emoji météo statique : ☀️
-- [x] Afficher un petit message météo statique
+- [x] Afficher une ville active : Montréal
+- [x] Afficher une température : 22°C
+- [x] Afficher une condition météo : Ensoleillé
+- [x] Afficher un emoji météo : ☀️
+- [x] Afficher un petit message météo
+- [x] Préparer plusieurs villes fictives
+- [x] Afficher temporairement une section `Mes endroits`
+
+## Fonctionnalités restantes
+
 - [ ] Afficher une prévision sur 3 jours
-- [ ] Afficher un écran `Mes endroits`
+- [ ] Transformer `Mes endroits` en vrai écran navigable
 - [ ] Changer de ville avec une sélection simple
+- [ ] Ajouter une navigation simple entre météo principale et `Mes endroits`
 
 ---
 
-# Affichage actuel
+# Affichage actuel attendu
 
 ```txt
 SmilySun
@@ -104,9 +115,15 @@ Montréal
 Ensoleillé
 
 Belle journée pour sortir un peu.
+
+Mes endroits
+Montréal — ☀️ 22°C
+Tokyo — 🌤️ 27°C
+Kyoto — ☁️ 24°C
+Québec — 🌥️ 18°C
 ```
 
-L’affichage est volontairement simple. Le but de l’étape 2 était de valider Compose, la structure de base, le layout vertical, le centrage et la lisibilité minimale.
+L’affichage est encore volontairement brut. Le but actuel est de poser la structure, pas de finaliser le design.
 
 ---
 
@@ -129,6 +146,8 @@ Contenu envisagé progressivement :
 - aperçu des prévisions horaires
 - aperçu des prévisions sur quelques jours
 
+Note actuelle : le fichier `WeatherHomeScreen.kt` existe. La fonction peut encore s’appeler `HomeScreen` selon le dernier WIP local. À nettoyer dans la prochaine passe pour que nom de fichier et nom de composable soient alignés.
+
 ## SavedLocationsScreen
 
 Écran `Mes endroits`.
@@ -145,11 +164,13 @@ Contenu envisagé progressivement :
 - icône / emoji météo
 - heure locale fictive ou formatée
 
+État actuel : l’écran est préparé, mais pas encore branché à une navigation réelle.
+
 ---
 
 # Modèles de données : note importante
 
-Le modèle actuel `WeatherDay` est utile pour apprendre, mais il est probablement temporaire.
+Le modèle actuel `WeatherDay` est utile pour apprendre, mais il est temporaire.
 
 Les modèles devront évoluer selon :
 
@@ -158,8 +179,6 @@ Les modèles devront évoluer selon :
 2. les données fictives nécessaires
 3. plus tard, les données reçues par l’API météo choisie
 ```
-
-Donc on garde une approche souple.
 
 Modèles probables plus tard :
 
@@ -174,109 +193,48 @@ Mais on ne crée pas tout maintenant.
 
 ---
 
-# Exemple d’affichage cible V1
-
-```txt
-SmilySun
-
-Montréal
-Aujourd’hui
-
-☀️ 22°C
-Ensoleillé
-
-Belle journée pour sortir un peu.
-
-Prévisions :
-Aujourd’hui     ☀️ 22°C
-Demain          ☁️ 18°C
-Après-demain    🌧️ 15°C
-```
-
----
-
-# Structure actuelle / cible
-
-## Structure actuelle simplifiée
-
-Pour apprendre, les premiers composables sont encore dans `MainActivity.kt`.
+# Structure actuelle
 
 ```txt
 app/src/main/java/com/example/smilysun/
 ├── MainActivity.kt
-└── model/
-    └── WeatherDay.kt
-```
-
-## Structure cible progressive
-
-Quand le fichier commence à grossir, on séparera les responsabilités :
-
-```txt
-app/src/main/java/com/example/smilysun/
-├── MainActivity.kt
-├── ui/
-│   ├── SmilySunApp.kt
-│   ├── screen/
-│   │   ├── WeatherHomeScreen.kt
-│   │   └── SavedLocationsScreen.kt
-│   └── component/
-│       ├── WeatherCard.kt
-│       ├── ForecastList.kt
-│       ├── SavedLocationRow.kt
-│       └── CitySelector.kt
+├── data/
+│   └── FakeWeatherRepository.kt
 ├── model/
-│   ├── WeatherDay.kt
-│   └── WeatherLocation.kt
-└── data/
-    └── FakeWeatherRepository.kt
+│   └── WeatherDay.kt
+└── ui/
+    ├── SmilySunApp.kt
+    ├── component/
+    │   ├── SavedLocationRow.kt
+    │   └── SavedLocationsSection.kt
+    └── screen/
+        ├── SavedLocationsScreen.kt
+        └── WeatherHomeScreen.kt
 ```
 
-Règle :
+## Responsabilités actuelles
 
 ```txt
-MainActivity = point d’entrée Android uniquement
-SmilySunApp = racine Compose + navigation simple
-WeatherHomeScreen = météo de la ville sélectionnée
-SavedLocationsScreen = gestion/choix des villes
-component/ = composants réutilisables
-model/ = data classes
-data/ = données locales/fictives
-```
+MainActivity
+= point d’entrée Android uniquement
 
----
+SmilySunApp
+= racine Compose, prépare les données fake et affiche l’écran principal
 
-# État actuel du code
+WeatherHomeScreen.kt
+= écran météo principal, reçoit les données à afficher
 
-## `WeatherDay.kt`
+SavedLocationsScreen.kt
+= futur écran Mes endroits, préparé mais pas encore navigable
 
-```kotlin
-package com.example.smilysun.model
+SavedLocationsSection / SavedLocationRow
+= composants temporaires pour afficher les villes sauvegardées
 
-/**
- * WeatherDay représente une journée météo dans SmilySun.
- *
- * Pour la V1, ces données seront fictives et locales.
- * Plus tard, ce modèle pourra aussi servir à représenter une météo venant d’une API.
- */
-data class WeatherDay(
-    val city: String,
-    val temperature: Int,
-    val condition: String,
-    val emoji: String,
-    val message: String
-)
-```
+WeatherDay
+= modèle pédagogique temporaire
 
-## `MainActivity.kt`
-
-`HomeScreen` reçoit maintenant un objet `WeatherDay` en paramètre.
-
-Cela permet de commencer à séparer :
-
-```txt
-données météo
-interface Compose
+FakeWeatherRepository
+= source de données fictives locale
 ```
 
 ---
@@ -287,26 +245,21 @@ interface Compose
 
 Statut : terminé.
 
-### Checklist Étape 1
-
 - [x] Ouvrir Android Studio
 - [x] Créer le projet `SmilySun`
 - [x] Utiliser Kotlin
 - [x] Ajouter Jetpack Compose manuellement via Gradle
-- [x] Attendre que Gradle Sync se termine
-- [x] Vérifier le package réel du projet : `com.example.smilysun`
-- [x] Vérifier que `MainActivity.kt` existe
-- [x] Vérifier que `AndroidManifest.xml` existe
-- [x] Transformer `MainActivity` en vraie Activity Android
+- [x] Vérifier le package réel : `com.example.smilysun`
+- [x] Vérifier `MainActivity.kt`
+- [x] Vérifier `AndroidManifest.xml`
 - [x] Déclarer `MainActivity` dans le Manifest
-- [x] Ajouter `MAIN` dans l’`intent-filter`
-- [x] Ajouter `LAUNCHER` dans l’`intent-filter`
-- [x] Ajouter `onCreate` dans `MainActivity`
+- [x] Ajouter `MAIN`
+- [x] Ajouter `LAUNCHER`
+- [x] Ajouter `onCreate`
 - [x] Ajouter `setContent`
-- [x] Afficher un premier `Text("SmilySun")`
+- [x] Afficher `Text("SmilySun")`
 - [x] Créer un émulateur local stable
 - [x] Lancer l’app
-- [x] Vérifier que l’écran affiche `SmilySun`
 
 ---
 
@@ -314,30 +267,21 @@ Statut : terminé.
 
 Statut : terminé.
 
-### Checklist Étape 2
-
-- [x] Créer une fonction `SmilySunApp`
-- [x] Déplacer l’appel UI dans `SmilySunApp`
-- [x] Ajouter l’import `@Composable`
-- [x] Remplacer `Text("SmilySun")` dans `setContent` par `SmilySunApp()`
-- [x] Créer une fonction `HomeScreen`
-- [x] Faire appeler `HomeScreen()` par `SmilySunApp()`
-- [x] Ajouter une `Column`
-- [x] Mettre les textes les uns sous les autres
+- [x] Créer `SmilySunApp`
+- [x] Créer un premier écran météo
+- [x] Ajouter `Column`
 - [x] Afficher `SmilySun`
 - [x] Afficher `Montréal`
 - [x] Afficher `☀️ 22°C`
 - [x] Afficher `Ensoleillé`
 - [x] Afficher un message météo statique
-- [x] Ajouter `Modifier.padding(24.dp)`
-- [x] Ajouter `fillMaxSize()`
-- [x] Ajouter `verticalArrangement = Arrangement.Center`
-- [x] Ajouter `horizontalAlignment = Alignment.CenterHorizontally`
-- [x] Ajouter des tailles de texte avec `fontSize`
-- [x] Ajouter des `Spacer`
-- [x] Ajouter de la KDoc simple sur `MainActivity`, `SmilySunApp`, `HomeScreen`
-- [x] Lancer l’app après ces changements
-- [x] Vérifier que l’écran statique s’affiche correctement
+- [x] Ajouter `padding`
+- [x] Ajouter `fillMaxSize`
+- [x] Centrer avec `Arrangement.Center`
+- [x] Centrer horizontalement avec `Alignment.CenterHorizontally`
+- [x] Ajouter `fontSize`
+- [x] Ajouter `Spacer`
+- [x] Ajouter de la KDoc simple
 
 ---
 
@@ -347,48 +291,48 @@ Statut : en cours.
 
 Objectif : sortir les valeurs météo de l’UI pour commencer à séparer données et affichage.
 
-Checklist :
-
-- [x] Créer le dossier `model`
-- [x] Créer le fichier `WeatherDay.kt`
+- [x] Créer le package `model`
+- [x] Créer `WeatherDay.kt`
 - [x] Créer une `data class WeatherDay`
 - [x] Ajouter `city`
 - [x] Ajouter `temperature`
 - [x] Ajouter `condition`
 - [x] Ajouter `emoji`
 - [x] Ajouter `message`
-- [x] Comprendre la différence entre `val` et `var`
-- [x] Comprendre que passer `weather: WeatherDay` ressemble à un input de composant
-- [x] Brancher temporairement `HomeScreen(weather = todayWeather)`
-- [ ] Décider si `WeatherDay` reste le bon modèle pour la suite immédiate
-- [ ] Ne pas aller trop loin dans les modèles avant de clarifier les écrans
+- [x] Comprendre `val` vs `var`
+- [x] Passer `weather: WeatherDay` à l’écran météo principal
+- [x] Commencer à retirer les valeurs hardcodées de l’UI
+- [ ] Décider si `WeatherDay` reste le modèle de transition pour la suite immédiate
+- [ ] Renommer/aligner `HomeScreen` en `WeatherHomeScreen` si ce n’est pas déjà fait dans le code
 
 ---
 
 # Étape 4 — Créer des données météo fictives
 
-Statut : à venir, mais dépend de la direction modèles/écrans.
+Statut : commencée.
 
-Checklist possible :
-
-- [ ] Créer le dossier `data`
-- [ ] Créer le fichier `FakeWeatherRepository.kt`
-- [ ] Créer un objet `FakeWeatherRepository`
-- [ ] Ajouter une météo fictive pour Montréal
-- [ ] Ajouter plusieurs villes si l’écran `Mes endroits` devient prioritaire
-- [ ] Comprendre le rôle d’un repository fake
+- [x] Créer le package `data`
+- [x] Créer `FakeWeatherRepository.kt`
+- [x] Créer un objet `FakeWeatherRepository`
+- [x] Ajouter une météo fictive pour Montréal
+- [x] Ajouter plusieurs villes fictives
+- [x] Ajouter `savedLocations`
+- [x] Ajouter `todayWeather = savedLocations.first()`
+- [ ] Décider si le repository doit maintenant exposer des modèles plus adaptés que `WeatherDay`
 
 ---
 
 # Étape 5 — Brancher l’interface sur les données
 
-Statut : à venir.
+Statut : commencée.
 
-Objectif :
-
-- [ ] Ne plus écrire les valeurs météo directement dans l’UI
-- [ ] Utiliser un ou plusieurs modèles météo
-- [ ] Afficher les données depuis l’objet reçu
+- [x] Ne plus écrire toutes les valeurs météo directement dans l’UI
+- [x] Utiliser un objet `WeatherDay`
+- [x] Afficher `weather.temperature`
+- [x] Afficher `weather.city`
+- [x] Afficher `weather.condition`
+- [x] Afficher `weather.emoji`
+- [x] Afficher `weather.message`
 - [ ] Préparer le futur changement vers une API météo
 
 ---
@@ -397,11 +341,7 @@ Objectif :
 
 Statut : à venir.
 
-Checklist :
-
-- [ ] Créer le dossier `ui/component`
-- [ ] Créer le fichier `WeatherCard.kt`
-- [ ] Créer une fonction composable `WeatherCard`
+- [ ] Créer un composant `WeatherCard`
 - [ ] Passer les données nécessaires en paramètre
 - [ ] Afficher l’emoji météo
 - [ ] Afficher la température
@@ -415,8 +355,6 @@ Checklist :
 
 Statut : à venir.
 
-Checklist :
-
 - [ ] Créer une liste `forecast`
 - [ ] Ajouter 3 journées météo
 - [ ] Afficher la liste
@@ -429,17 +367,15 @@ Checklist :
 
 # Étape 8 — Ajouter une sélection de ville / Mes endroits
 
-Statut : à venir.
+Statut : commencée.
 
-Checklist :
-
-- [ ] Créer plusieurs villes fictives
-- [ ] Créer un écran `SavedLocationsScreen`
-- [ ] Afficher les villes sauvegardées
-- [ ] Ajouter Montréal
-- [ ] Ajouter Tokyo
-- [ ] Ajouter Kyoto
-- [ ] Ajouter Québec ou autres villes
+- [x] Créer plusieurs villes fictives
+- [x] Créer `SavedLocationRow`
+- [x] Créer `SavedLocationsSection`
+- [x] Préparer `SavedLocationsScreen`
+- [x] Afficher temporairement les villes sauvegardées
+- [ ] Brancher une vraie navigation vers `SavedLocationsScreen`
+- [ ] Ajouter un bouton ou une action pour ouvrir `Mes endroits`
 - [ ] Ajouter une sélection de ville
 - [ ] Comprendre `remember`
 - [ ] Comprendre `mutableStateOf`
@@ -450,8 +386,6 @@ Checklist :
 # Étape 9 — Améliorer le style visuel
 
 Statut : à venir.
-
-Checklist :
 
 - [ ] Choisir une direction artistique simple
 - [ ] Ajouter un fond doux / gradient
@@ -466,8 +400,6 @@ Checklist :
 
 Statut : à venir.
 
-Checklist :
-
 - [ ] Faire bouger légèrement le soleil
 - [ ] Faire apparaître la carte météo doucement
 - [ ] Tester une animation simple
@@ -478,21 +410,20 @@ Checklist :
 
 # Étape 11 — Nettoyer le code
 
-Statut : à venir.
+Statut : commencée.
 
-Objectif : séparer progressivement le code en plusieurs fichiers.
-
-Checklist :
-
-- [ ] `MainActivity.kt` contient seulement le point d’entrée Android
-- [ ] `ui/SmilySunApp.kt`
-- [ ] `ui/screen/WeatherHomeScreen.kt`
-- [ ] `ui/screen/SavedLocationsScreen.kt`
-- [ ] `ui/component/WeatherCard.kt`
-- [ ] `ui/component/ForecastList.kt`
-- [ ] `ui/component/SavedLocationRow.kt`
-- [ ] `model/WeatherDay.kt`
-- [ ] `data/FakeWeatherRepository.kt`
+- [x] `MainActivity.kt` contient seulement le point d’entrée Android
+- [x] Créer `ui/SmilySunApp.kt`
+- [x] Créer `ui/screen/WeatherHomeScreen.kt`
+- [x] Créer `ui/screen/SavedLocationsScreen.kt`
+- [x] Créer `ui/component/SavedLocationRow.kt`
+- [x] Créer `ui/component/SavedLocationsSection.kt`
+- [x] Créer `model/WeatherDay.kt`
+- [x] Créer `data/FakeWeatherRepository.kt`
+- [ ] Créer `WeatherCard.kt`
+- [ ] Créer `ForecastList.kt`
+- [ ] Créer `ForecastItem.kt`
+- [ ] Vérifier les noms de fonctions et fichiers après refactor
 
 ---
 
@@ -509,14 +440,14 @@ Checklist :
 
 ## V1 — Version locale complète
 
-- [ ] données météo locales
-- [ ] écran météo principal
-- [ ] écran `Mes endroits`
-- [ ] plusieurs villes
+- [x] données météo locales simples
+- [x] écran météo principal préparé
+- [x] écran `Mes endroits` préparé
+- [x] plusieurs villes fictives
 - [ ] prévision sur 3 jours
-- [ ] sélection de ville
+- [ ] sélection de ville fonctionnelle
 - [ ] UI propre
-- [ ] composants séparés progressivement
+- [x] composants séparés progressivement
 
 ## V1.1 — Amélioration UX
 
@@ -539,27 +470,11 @@ Checklist :
 
 ---
 
-# Ce qu’on évite dans la V1
-
-Pour garder le projet simple, on évite au début :
-
-- [x] API météo
-- [x] backend
-- [x] login
-- [x] base de données distante
-- [x] géolocalisation réelle
-- [x] notifications
-- [x] publication Play Store
-- [x] architecture trop complexe
-
-Ici `[x]` veut dire : volontairement exclu de la V1.
-
----
-
 # Prochaine étape
 
-Stopper la progression technique trop rapide et clarifier la suite immédiate :
+Faire un point technique avant de continuer :
 
-- [ ] décider si on continue avec `WeatherDay` temporairement
-- [ ] décider si la prochaine priorité est `FakeWeatherRepository` ou la réflexion sur `WeatherHomeScreen` / `SavedLocationsScreen`
-- [ ] garder en tête que les modèles évolueront avec les écrans et la future API météo
+- [ ] vérifier que le projet compile après refactor
+- [ ] vérifier si `WeatherHomeScreen.kt` exporte bien `WeatherHomeScreen` ou encore `HomeScreen`
+- [ ] si besoin, aligner le nom du composable avec le fichier
+- [ ] ensuite seulement, ajouter l’état de navigation simple dans `SmilySunApp`
